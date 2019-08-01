@@ -22,8 +22,11 @@ class ReservePage extends Component{
     }
 
     GetRooms(){
-        console.log("Getting Room...");
-    }
+        fetch('http://localhost:9000/getRoom')
+            .then(res => res.text())
+            .then(text => this.setState({GetResponse : text}))
+            .catch(err => err)
+    };
 
     componentWillMount(){
         this.findRooms();
@@ -34,7 +37,7 @@ class ReservePage extends Component{
         return(
             <div className='reserve'>
                 Reserve Page
-                <p></p>
+                <p>{this.state.GetResponse}</p>
             </div>
         )
     }
