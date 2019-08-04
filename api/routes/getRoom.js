@@ -17,10 +17,14 @@ mongoose.connection.once("open", () => {
 
 // Return the json of all the room data
 router.get('/', function(req, res, next){
+	
 	OpenRoom.find({}, function(err, data){
 		if(err) res.send(err);
+		console.log(data);
 		res.json(data);
 	});
+	//var list = [{id: 1}, {id: 2}];
+	//res.json(list);
 });
 
 
