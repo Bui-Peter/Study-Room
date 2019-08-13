@@ -10,6 +10,7 @@ var usersRouter = require('./routes/users');
 var testAPIRouter = require('./routes/testAPI');
 var getRoomRouter = require('./routes/getRoom');
 var findRoomRouter = require('./routes/findRoom');
+var saveRoomRouter = require('./routes/saveRoom');
 
 var app = express();
 
@@ -29,6 +30,7 @@ app.use('/users', usersRouter);
 app.use('/testAPI', testAPIRouter);
 app.use('/getRoom', getRoomRouter);
 app.use('/findRoom', findRoomRouter);
+app.use('/saveRoom', saveRoomRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

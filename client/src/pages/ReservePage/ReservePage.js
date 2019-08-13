@@ -1,12 +1,15 @@
 import React, { Component } from 'react';
 import './style.css';
 
+import axios from 'axios';
+
 class ReservePage extends Component{
 
     constructor(props){
         super(props);
         this.state = {
-            list: []
+            list: [],
+            markedRooms: []
         };
     }
 
@@ -15,8 +18,6 @@ class ReservePage extends Component{
         console.log("Finding Rooms...");
 
         fetch('http://localhost:9000/findRoom')
-            .then(res => res.text())
-            .then(text => this.setState({saveResponse : text}))
             .catch(err => err)
     }
 
@@ -28,41 +29,54 @@ class ReservePage extends Component{
     };
 
     componentWillMount(){
-        //this.findRooms();
         this.GetRooms();
+    }
+
+    handleSaveRoom(e){
+        e.preventDefault();
+
+
+        axios.post('http://localhost:9000/saveRoom');
+
     }
 
     render(){
         const { list } = this.state;
-
+    
         return(
             <div className='reserve'>
-                Reserve Page
-                <p> 
-                    <div>
-                        {list.length ? (
-                            <div>
-                            {list.map((item) => {
-                                return(
-                                        <div className='room'>
-                                        Room: {item.roomID}
-                                        <p>Capacity: {item.capacity}</p>
-                                            <div className='time-list'>
-                                                <ul>
-                                                    {item.open.time.map((openTimes) => {
-                                                        return(
-                                                            <li>{ openTimes }</li>
-                                                        );
-                                                    })}
-                                                </ul>
-                                            </div>
+                Reserve Page   
 
-                                        </div>
-                                );
-                            })}
+                <p> 
+                    <div className='room-text'>
+                        {list.length ? (
+                            <div className='room-available'>
+                                <form onSubmit={this.handleSaveRoom}>
+
+                                    <button type='submit'>Save Room!</button>
+                                    {list.map((item) => {
+                                    return(
+                                            <div className='room'>
+                                                Room: {item.roomID}
+                                                <p>Capacity: {item.capacity}</p>
+
+                                                <div className='time-list'>
+                                                    <ul>
+                                                        {item.open.time.map((openTimes) => {
+                                                            return(                                                                
+                                                                    <li>{ openTimes }</li>
+                                                            );
+                                                        })}
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                    );
+                                })}
+
+                                </form>
                             </div>
                         ) : (
-                            <div>
+                            <div className='no-room-available'>
                                 No rooms available.
                             </div>
                         )

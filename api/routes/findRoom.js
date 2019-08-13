@@ -37,8 +37,9 @@ router.get('/', function(req, res, next){
     var year = new Date().getFullYear();
     var month = new Date().getMonth() + 1;
 
-    //var date = year + "-" + month + "-" + day;
-    var date = "2019-08-01";
+    var date = year + "-" + month + "-" + day;
+    
+    //var date = "2019-08-01";
     console.log("Date: " + date);
 
     var roomNumber = new OpenRoom();
