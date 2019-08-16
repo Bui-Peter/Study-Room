@@ -77,7 +77,6 @@ roomCoord.set(8118, 3111);
 
 router.post('/', (req, res) => {
     console.log("reserving room");
-    //console.log(req.body.bookings);
 });
 
 router.get('/', (req, res) => {
@@ -95,10 +94,6 @@ router.get('/', (req, res) => {
         }
 
     } 
-
-    //console.log(data.booking);
-
-
     // date format: 2019-08-15+14%3A30
     var fname = 'Peter';
     var lname = 'Bui';
