@@ -41,20 +41,19 @@ class ReservePage extends Component{
         var startTime = this.state.start;
         var endTime = this.state.end;
 
-        if(startTime == '' || endTime == ''){
+        if(startTime === '' || endTime === ''){
             alert("Did not select 2 options"); 
             return;
         }
             
 
         //format date into: 2019-08-15+14%3A30
-
-        if(startTime.substring(startTime.length-2, startTime.length == 'pm'))
+        if(startTime.substring(startTime.length-2, startTime.length) === 'pm')
             startTime = (parseInt(startTime.split(':')[0]) + 12).toString() + '%3A' + startTime.split(':')[1].substring(0, 2);
         else   
             startTime = startTime.split(':')[0] + '%3A' + startTime.split(':')[1].substring(0, 2);
 
-        if(endTime.substring(endTime.length-2, endTime.length) == 'pm')
+        if(endTime.substring(endTime.length-2, endTime.length) === 'pm')
             endTime = (parseInt(endTime.split(':')[0]) + 12).toString() + '%3A' + endTime.split(':')[1].substring(0, 2);
         else
             endTime = endTime.split(':')[0] + '%3A' + endTime.split(':')[1].substring(0, 2);
@@ -67,8 +66,8 @@ class ReservePage extends Component{
         var year = new Date().getFullYear();
         var month = new Date().getMonth() + 1;
 
-        //var date = year + "-" + month + "-" + day;
-        var date = "2019-08-19";
+        var date = year + "-" + month + "-" + day;
+        //var date = "2019-08-19";
 
         startTime = date + '+' + startTime;
         endTime = date + '+' + endTime;
@@ -78,10 +77,6 @@ class ReservePage extends Component{
             start: startTime,
             end: endTime
         }
-
-        console.log(data.room);
-
-        //console.log(data);
 
         axios.post('http://localhost:9000/saveRoom', data);
     }
