@@ -8,7 +8,6 @@ var cors = require('cors');
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var testAPIRouter = require('./routes/testAPI');
-var getRoomRouter = require('./routes/getRoom');
 var findRoomRouter = require('./routes/findRoom');
 var saveRoomRouter = require('./routes/saveRoom');
 
@@ -28,7 +27,6 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/testAPI', testAPIRouter);
-app.use('/getRoom', getRoomRouter);
 app.use('/findRoom', findRoomRouter);
 app.use('/saveRoom', saveRoomRouter);
 

@@ -25,21 +25,21 @@ router.get('/', function(req, res, next){
     OpenRoom.deleteMany({}, function(err){
         if(err) console.log("Error deleting open rooms");
         else {
-            console.log("Removed Rooms");
+            console.log("Cleared rooms");
             saveRoom();
         };
     })
 
-    console.log("Scraping room...");    
+    console.log("Searching for rooms...");    
 
     //find the current date, set it in the proper format
     var day = new Date().getDate();
     var year = new Date().getFullYear();
     var month = new Date().getMonth() + 1;
 
-    var date = year + "-" + month + "-" + day;
+    //var date = year + "-" + month + "-" + day;
     
-    //var date = "2019-08-01";
+    var date = "2019-08-19";
     console.log("Date: " + date);
 
     var roomNumber = new OpenRoom();
@@ -55,6 +55,7 @@ router.get('/', function(req, res, next){
         6 = 2118,
         8 = 2119
     */
+   
     const saveRoom = async () => {
             for(var counter = 0; counter < 5; counter++){
 
@@ -65,19 +66,21 @@ router.get('/', function(req, res, next){
                 const url = "https://gmu.libcal.com/spaces/accessible/ajax/group?prevGroupId=" + roomSize + "&gid=" + roomSize + "&capacity=0&date=" + date;
     
                 console.log("Saving room sizes:" + roomSize);
-    
+                
                 await axios.get(url)
                 .then(function(response){
     
                     if(response.status == 200){
                         const $ = cheerio.load(response.data);
-    
+                        
+                        // get all the open times
                         $('.panel').each(function(i, element){
                             var openTime = [];
                             $(this).children('.panel-body').find('.checkbox').each(function(i, element){
                                 openTime[i] = $(this).text().trim();
                             });
-    
+                            
+                            // assignt to datapoint
                             roomNumber = {
                                 roomID: $(this).children('.panel-heading').text().trim().substring(0, 4),
                                 open: {date: date, time: openTime},
@@ -90,25 +93,14 @@ router.get('/', function(req, res, next){
                 }, function(error) {console.log(error)});   
             };
 
-            /*OpenRoom.find({}).sort({capacity: 'ascending'}).exec(function(err, response){
-                if(err)
-                    return console.log(err.message);
-        
-                console.log("Finished sorting!");
-                res.send("Done");
+            // Display data in JSON
+            await OpenRoom.find({}, function(err, data){
+                if(err) res.send(err);
+
+                console.log("Sending data to reserve...");
+                res.json(data);
             });
-            */
     };
-
-    //console.log("Saved Data.");
-
-    const sortRoom = async () => {
-
-    };
-
-    //sortRoom();
-
-    //res.redirect('../');
 });
 
 module.exports = router;
