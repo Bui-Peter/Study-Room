@@ -14,7 +14,8 @@ class ReservePage extends Component{
             start: '',
             end: '',
             hasStart: false,
-            hasEnd: false
+            hasEnd: false,
+            isLoadingRoom: true
         };
 
         this.handleChange = this.handleChange.bind(this);
@@ -24,9 +25,12 @@ class ReservePage extends Component{
     // Retrieve the rooms and set it into a list in the states
     GetRooms(){
 
+        this.setState({isLoadingRoom: true});
+
+
         fetch('http://localhost:9000/findRoom')
             .then(res => res.json())
-            .then(list => this.setState({ list }))
+            .then(list => this.setState({list: list, isLoadingRoom: false}))
             .catch(err => err)
     };
 
@@ -66,8 +70,8 @@ class ReservePage extends Component{
         var year = new Date().getFullYear();
         var month = new Date().getMonth() + 1;
 
-        var date = year + "-" + month + "-" + day;
-        //var date = "2019-08-19";
+        //var date = year + "-" + month + "-" + day;
+        var date = "2019-08-23";
 
         startTime = date + '+' + startTime;
         endTime = date + '+' + endTime;
@@ -85,30 +89,21 @@ class ReservePage extends Component{
     handleChange(event){
         console.log(event.target.value);
 
-        var roomID = event.target.value.substring(0, 4);
+        var roomID = event.target.name.substring(0, 4);
         var time = '';
 
         // determine whether the time is the start or the end (left or right of the value)
-        this.state.hasStart === false ? time = event.target.value.split(' ')[1] : time = event.target.value.split(' ')[3];
+        this.state.hasStart === false ? time = event.target.value : time = event.target.value;
 
         
 
         this.setState({room: roomID});
 
         //assign start time or end time and check off whether it exists or not
-        if(event.target.checked){
-            if(this.state.hasStart === false)
-                this.setState({start: time, hasStart: true});
-            else if(this.state.hasStart)
-                this.setState({end: time, hasEnd: true});
-        }
-        else {
-            if(this.state.hasStart && this.state.hasEnd)
-                this.setState({end: '', hasEnd: false});
-            else if(this.state.hasStart && this.state.hasEnd === false)
-                this.setState({start: '', hasStart: false});
-        }
-        
+        if(this.state.hasStart === false)
+            this.setState({start: time, hasStart: true})
+        else
+            this.setState({end: time, hasEnd: true})
 
     }
 
@@ -116,24 +111,34 @@ class ReservePage extends Component{
 
     render(){
         const list = this.state.list;
-    
+        var searchingRoom;
+        var listing;
+
+        if(this.state.isLoadingRoom)
+            searchingRoom = <div className='loading-room'>Searching for open rooms...</div>
+        else
+            searchingRoom = <div className='room-unavailable'>There are no open rooms for today.</div>
+
+
         return(
             <div className='reserve'>
                 Reserve Page   
+                <br></br>
+                Choose a {this.state.hasStart ? 'end' : 'start'} time
 
                     <div className='room-text'>
                         {list.length ? (
                             <div className='room-available'>
                                 <form onSubmit={this.handleSaveRoom}>
                                     <button type='submit'>Save Room!</button>
-                                    
-                                    <ListRooms items={list} handleChange={this.handleChange}  />
+                                    {listing}
+                                    <ListRooms items={list} hasStart={this.state.hasStart} handleChange={this.handleChange}  />
 
                                 </form>
                             </div>
                         ) : (
-                            <div className='no-room-available'>
-                                No rooms available.
+                            <div className='searching'>
+                                {searchingRoom}
                             </div>
                         )
                     }   
@@ -155,7 +160,7 @@ function ListRooms(props){
                         Room: {item.roomID} <br></br>
                         Capacity: {item.capacity}
 
-                        <ListOpenTimes times={item.open.time} roomID={item.roomID} handleChange={props.handleChange} />
+                        <ListOpenTimes times={item.open.time} roomID={item.roomID} hasStart={props.hasStart} handleChange={props.handleChange} />
                     </div>
                 );
             })}
@@ -166,16 +171,23 @@ function ListRooms(props){
 //List every available time for each room
 function ListOpenTimes(props){
     const openTimes = props.times
+    const hasStart = props.hasStart
 
     return(
         <div className='time-list'>
             {openTimes.map( (time) => {
-                return(
-                    <div className='time' key={props.roomID + ' ' + time}>
-                        <input type='checkbox' name={ time } value={ props.roomID + ' ' + time } onChange={props.handleChange} />
-                        { time }
-                    </div>
-                )
+                if(hasStart === false)
+                    return(
+                        <div className='time' key={props.roomID + ' ' + time}>
+                            <input type='button' name={ props.roomID + ' ' + time.split(' ')[0] } value={ time.split(' ')[0] } onClick={props.handleChange} />
+                        </div>
+                    )
+                else
+                    return(
+                        <div className='time' key={props.roomID + ' ' + time}>
+                            <input type='button' name={ props.roomID + ' ' + time.split(' ')[1] } value={ time.split(' ')[2] } onClick={props.handleChange} />
+                        </div>
+                    )
             })}
         </div>
     );

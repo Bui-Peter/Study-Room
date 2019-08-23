@@ -26,7 +26,7 @@ router.get('/', function(req, res, next){
         if(err) console.log("Error deleting open rooms");
         else {
             console.log("Cleared rooms");
-            saveRoom();
+            search();
         };
     })
 
@@ -39,7 +39,7 @@ router.get('/', function(req, res, next){
 
     //var date = year + "-" + month + "-" + day;
     
-    var date = "2019-08-19";
+    var date = "2019-08-23";
     console.log("Date: " + date);
 
     var roomNumber = new OpenRoom();
@@ -56,51 +56,77 @@ router.get('/', function(req, res, next){
         8 = 2119
     */
    
-    const saveRoom = async () => {
-            for(var counter = 0; counter < 5; counter++){
+    const search = (async () => {
+        await saveOpenRooms(date);
 
-                const roomSize = (counter == 0 ? 2142: 2115 + counter);
-                
-    
-                //Note that prevGroupID and gid must be the same
-                const url = "https://gmu.libcal.com/spaces/accessible/ajax/group?prevGroupId=" + roomSize + "&gid=" + roomSize + "&capacity=0&date=" + date;
-    
-                console.log("Saving room sizes:" + roomSize);
-                
-                await axios.get(url)
-                .then(function(response){
-    
-                    if(response.status == 200){
-                        const $ = cheerio.load(response.data);
-                        
-                        // get all the open times
-                        $('.panel').each(function(i, element){
-                            var openTime = [];
-                            $(this).children('.panel-body').find('.checkbox').each(function(i, element){
-                                openTime[i] = $(this).text().trim();
-                            });
-                            
-                            // assignt to datapoint
-                            roomNumber = {
-                                roomID: $(this).children('.panel-heading').text().trim().substring(0, 4),
-                                open: {date: date, time: openTime},
-                                capacity: $(this).children('.panel-heading').children('.pull-right').text().trim().substring(9, 11)
-                            };
-    
-                            OpenRoom(roomNumber).save();
-                        });
-                    };     
-                }, function(error) {console.log(error)});   
-            };
+        // display open rooms
+        await OpenRoom.find({}, function(err, data) {
+            if (err) res.send(err);
+            console.log('Displaying data');
+            res.json(data);
+        });
+    });
 
-            // Display data in JSON
-            await OpenRoom.find({}, function(err, data){
-                if(err) res.send(err);
-
-                console.log("Sending data to reserve...");
-                res.json(data);
-            });
-    };
 });
+
+async function saveOpenRooms(date){
+    var saved = 0;
+    var totalOpen = 0;
+
+    var promises = [];
+    
+    for(var counter = 0; counter < 6; counter++){
+
+        const roomSize = (counter == 0 ? 2142: 2115 + counter);
+        
+
+        //Note that prevGroupID and gid must be the same
+        const url = "https://gmu.libcal.com/spaces/accessible/ajax/group?prevGroupId=" + roomSize + "&gid=" + roomSize + "&capacity=0&date=" + date;
+
+        console.log("Saving room sizes:" + roomSize);
+
+
+        //await OpenRoom(roomNumber).save();
+        await axios.get(url)
+        .then(function(response){
+            if(response.status == 200){
+                const $ = cheerio.load(response.data);
+                
+                // get all the open times
+                
+                $('.panel').each(function(i, element){
+                    totalOpen++;
+                    var openTime = [];
+                
+                    $(this).children('.panel-body').find('.checkbox').each(function(i, element){
+                        openTime[i] = $(this).text().trim();
+                    });
+                    
+                    // assign to datapoint
+                    roomNumber = {
+                        roomID: $(this).children('.panel-heading').text().trim().substring(0, 4),
+                        open: {date: date, time: openTime},
+                        capacity: $(this).children('.panel-heading').children('.pull-right').text().trim().substring(9, 11)
+                    };
+
+                    promises.push(OpenRoom(roomNumber).save());
+                });
+
+            };  
+        }, function(error) {console.log(error)});  
+         
+    };
+
+    await Promise.all(promises)
+        .then(() => {
+            console.log('Found all rooms');
+            return true;
+        })
+        .catch((err) => {
+            console.log(err);
+            return false;
+        });
+
+}
 
 module.exports = router;

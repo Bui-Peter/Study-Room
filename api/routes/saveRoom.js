@@ -132,8 +132,8 @@ router.get('/', (req, res) => {
     var eid = roomCoord.get(1205);
     var gid = 2116;
     var lid = 1205;
-    var start = '2019-08-16+12%3A30';
-    var end = '2019-08-16+15%3A30';
+    var start = '2019-08-21+12%3A30';
+    var end = '2019-08-21+15%3A30';
 
     var data = 'formData%5Bfname%5D=' + fname + '&formData%5Blname%5D=' + lname + '&formData%5Bemail%5D=' + email + '%40masonlive.gmu.edu&forcedEmail=&bookings%5B0%5D%5Bid%5D=1&bookings%5B0%5D%5Beid%5D=' + eid + '&bookings%5B0%5D%5Bgid%5D=' + gid + '&bookings%5B0%5D%5Blid%5D=' + lid + '&bookings%5B0%5D%5Bstart%5D=' + start + '&bookings%5B0%5D%5Bend%5D=' + end + '&returnUrl=%2Fspaces';
 
