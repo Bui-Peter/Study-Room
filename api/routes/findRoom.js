@@ -118,14 +118,8 @@ async function saveOpenRooms(date){
     };
 
     await Promise.all(promises)
-        .then(() => {
-            console.log('Found all rooms');
-            return true;
-        })
-        .catch((err) => {
-            console.log(err);
-            return false;
-        });
+    console.log('Finished saving rooms');
+    return true;
 
 }
 
