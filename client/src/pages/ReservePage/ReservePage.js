@@ -197,6 +197,7 @@ function ListOpenTimes(props){
     const hasStart = props.hasStart
 
     var prevTime = 0;
+    var reserveLimit = 0;
 
     // initialize prevTime to be the starting time
     if(hasStart){
@@ -210,13 +211,15 @@ function ListOpenTimes(props){
         <div className='time-list'>
             {openTimes.map( (time) => {
                 // display all times
+                console.log(reserveLimit);
                 if(hasStart === false)
                     return(
                         <div className='time' key={props.roomID + ' ' + time}>
                             <input type='button' name={ props.roomID + ' ' + time.split(' ')[0] } value={ time.split(' ')[0] } onClick={props.handleChange} />
                         </div>
                     )
-                else{
+                // allow only 8 valid blocks (240 minutes)
+                else if(reserveLimit < 8){
                     var currentTime = 0;
                     var endTime = time.split(' ')[2];
 
@@ -227,7 +230,9 @@ function ListOpenTimes(props){
                         currentTime = parseInt((parseInt(endTime.split(':')[0])).toString() + endTime.split(':')[1].substring(0,2));
                     
                     // check if it's the next iteration in sequence
+                    
                     if(currentTime == prevTime + 30 || currentTime == prevTime + 70){
+                        reserveLimit++;
                         prevTime = currentTime;
                         return(
                             <div className='time' key={props.roomID + ' ' + time}>
@@ -235,6 +240,8 @@ function ListOpenTimes(props){
                             </div>
                         )
                     }
+
+                    
                 }          
             })}
         </div>
