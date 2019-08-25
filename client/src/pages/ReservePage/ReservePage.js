@@ -208,7 +208,6 @@ class ReservePage extends Component{
                                     <button type='submit'>Save Room!</button>
                                     {listing}
                                     <ListRooms items={list} hasStart={this.state.hasStart} currentRoom={this.state.room} startTime={this.state.start} handleChange={this.handleChange}  />
-
                                 </form>
                             </div>
                         ) : (
