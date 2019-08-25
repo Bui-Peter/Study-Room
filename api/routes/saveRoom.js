@@ -90,9 +90,9 @@ router.post('/', (req, res) => {
     } 
 
     // date format: 2019-08-15+14%3A30
-    var fname = 'Peter';
-    var lname = 'Bui';
-    var email = 'pbui8';
+    var fname = req.body.fname;
+    var lname = req.body.lname;
+    var email = req.body.split('@')[0];
     var eid = roomCoord.get(parseInt(req.body.room));
     var gid = 2142;
     var lid = req.body.room;
@@ -112,36 +112,5 @@ router.post('/', (req, res) => {
 
     res.send("save server");    
 });
-
-router.get('/', (req, res) => {
-
-    var config = {
-        headers: {
-            'Accept': 'application/json, text/javascript, */*; q=0.01',
-            'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
-            'Referer': 'https://gmu.libcal.com/spaces?lid=1205&gid=2118',
-            'Sec-Fetch-Mode': 'cors',
-            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/76.0.3809.100 Safari/537.36',
-            'X-Requested-With': 'XMLHttpRequest'
-        }
-    } 
-    // date format: 2019-08-15+14%3A30
-    var fname = 'Peter';
-    var lname = 'Bui';
-    var email = 'pbui8';
-    var eid = roomCoord.get(1205);
-    var gid = 2116;
-    var lid = 1205;
-    var start = '2019-08-21+12%3A30';
-    var end = '2019-08-21+15%3A30';
-
-    var data = 'formData%5Bfname%5D=' + fname + '&formData%5Blname%5D=' + lname + '&formData%5Bemail%5D=' + email + '%40masonlive.gmu.edu&forcedEmail=&bookings%5B0%5D%5Bid%5D=1&bookings%5B0%5D%5Beid%5D=' + eid + '&bookings%5B0%5D%5Bgid%5D=' + gid + '&bookings%5B0%5D%5Blid%5D=' + lid + '&bookings%5B0%5D%5Bstart%5D=' + start + '&bookings%5B0%5D%5Bend%5D=' + end + '&returnUrl=%2Fspaces';
-
-    axios.post(url, data, config)
-        .then(info => console.log(info.data))
-        .catch(error => console.log(error));
-
-    res.send("save server");
-})
 
 module.exports = router;
