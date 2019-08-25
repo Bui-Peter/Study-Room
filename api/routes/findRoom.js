@@ -20,7 +20,6 @@ mongoose.connection.once("open", () => {
 
 // Routing
 router.get('/', function(req, res, next){
-
     //refresh all the rooms by deleting
     OpenRoom.deleteMany({}, function(err){
         if(err) console.log("Error deleting open rooms");
@@ -37,9 +36,7 @@ router.get('/', function(req, res, next){
     var year = new Date().getFullYear();
     var month = new Date().getMonth() + 1;
 
-    //var date = year + "-" + month + "-" + day;
-    
-    var date = "2019-08-23";
+    var date = req.query.date;
     console.log("Date: " + date);
 
     var roomNumber = new OpenRoom();
@@ -58,16 +55,19 @@ router.get('/', function(req, res, next){
    
     const search = (async () => {
         await saveOpenRooms(date);
-
+      
         // display open rooms
-        await OpenRoom.find({}, function(err, data) {
+        OpenRoom.find({}, function(err, data) {
             if (err) res.send(err);
             console.log('Displaying data');
             res.json(data);
         });
+
     });
 
 });
+
+
 
 async function saveOpenRooms(date){
     var saved = 0;

@@ -8,6 +8,12 @@ class ReservePage extends Component{
 
     constructor(props){
         super(props);
+
+        //find the current date, set it in the proper format
+        var day = new Date().getDate();
+        var year = new Date().getFullYear();
+        var month = new Date().getMonth() + 1;
+
         this.state = {
             list: [],
             room: 0,
@@ -15,20 +21,24 @@ class ReservePage extends Component{
             end: '',
             hasStart: false,
             hasEnd: false,
-            isLoadingRoom: true
+            isLoadingRoom: true,
+            date: year + "-" + month + "-" + day,
+            increments: 0
+            //date: '2019-08-26'
         };
+
+        
 
         this.handleChange = this.handleChange.bind(this);
         this.handleSaveRoom = this.handleSaveRoom.bind(this);
+        this.GetRooms = this.GetRooms.bind(this);
     }
 
     // Retrieve the rooms and set it into a list in the states
     GetRooms(){
 
         this.setState({isLoadingRoom: true});
-
-
-        fetch('http://localhost:9000/findRoom')
+        fetch('http://localhost:9000/findRoom' + '?date=' + this.state.date) 
             .then(res => res.json())
             .then(list => this.setState({list: list, isLoadingRoom: false}))
             .catch(err => err)
@@ -65,16 +75,9 @@ class ReservePage extends Component{
         console.log('start: ' + startTime);
         console.log('end: ' + endTime);
             
-        //find the current date, set it in the proper format
-        var day = new Date().getDate();
-        var year = new Date().getFullYear();
-        var month = new Date().getMonth() + 1;
 
-        //var date = year + "-" + month + "-" + day;
-        var date = "2019-08-23";
-
-        startTime = date + '+' + startTime;
-        endTime = date + '+' + endTime;
+        startTime = this.state.date + '+' + startTime;
+        endTime = this.state.date + '+' + endTime;
 
         var data = {
             room: this.state.room,
@@ -107,6 +110,74 @@ class ReservePage extends Component{
 
     }
 
+    async handleDateChange(event, isIncrement){
+        var day = this.state.date.split('-')[2];
+        var month = this.state.date.split('-')[1];
+        var year = this.state.date.split('-')[0];   
+        
+        console.log(month);
+        if(isIncrement){
+            await this.setState({increments: this.state.increments+1});
+
+            if(this.state.increments > 7){
+                alert('No room available past 7 days,');
+                this.setState({increments: this.state.increments-1});
+                return;
+            }
+            day = (parseInt(day) + 1);
+            month = (parseInt(month));
+
+            if(day == 31)
+                if(month == 2 || month == 4 || month == 6 || month == 9 || month == 11){
+                    day = 1;
+                    month++; 
+                }
+            if(day == 32){
+                day = 1;
+                month++;
+            }
+
+            if(month == 13){
+                month = 1;
+                year++;
+            }
+        }
+
+        if(isIncrement == false){
+
+            await this.setState({increments: this.state.increments-1});
+
+            if(this.state.increments < 0){
+                alert('Cannot go back more than today.');
+                this.setState({increments: this.state.increments+1});
+                return;
+            }
+            day = (parseInt(day) - 1);
+            month = (parseInt(month));
+
+            if(day == 0){
+                month--; 
+                if(month == 0){
+                    day = 31;
+                    month = 12;
+                    year--;
+                }
+                else if(month == 2 || month == 4 || month == 6 || month == 9 || month == 11){
+                    day = 30;   
+                }
+                else
+                    day = 31;
+            }
+                
+        }
+
+        
+
+
+        var newDate = year + '-' + month + '-' + day;
+        await this.setState({isLoadingRoom: true, date: newDate});
+        this.GetRooms();
+}
 
 
     render(){
@@ -123,9 +194,13 @@ class ReservePage extends Component{
         return(
             <div className='reserve'>
                 Reserve Page   
-                <br></br>
+                <br />
+                {this.state.date}
+                <br />
+                <input type='button' value='<-' onClick={(e) => {this.handleDateChange(e, false)}} /> <input type='button' value='->' onClick={(e) => {this.handleDateChange(e, true)}} />
+                <br />
                 Choose a {this.state.hasStart ? 'end' : 'start'} time
-
+                    
                     <div className='room-text'>
                         {list.length ? (
                             <div className='room-available'>
