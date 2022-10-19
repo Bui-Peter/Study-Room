@@ -8,7 +8,7 @@ const router = express.Router();
 let OpenRoom = require('../models/OpenRoom.model');
 
 // Connect o database
-mongoose.connect('mongodb+srv://Junjiy:Youtoo12@study-rooms-ao8dt.mongodb.net/test?retryWrites=true&w=majority', {useNewUrlParser : true});
+mongoose.connect('mongodb+srv://Junjiy:password@study-rooms-ao8dt.mongodb.net/test?retryWrites=true&w=majority', {useNewUrlParser : true});
 
 mongoose.connection.on("error", error => {
 	console.log("Database connection error: ", error);
